@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Search</title>
+    <style>
+        /* Background styling */
+        body {
+            background-image: url('https://stephenhilt.com/images/background-image.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Container for readable content */
+        .content {
+            background-color: rgba(0, 0, 0, 0.7); /* Dark overlay for readability */
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        h1, h2 {
+            text-align: center;
+	    color: white;
+        }
+
+        /* Table styling */
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+	    color: white;
+        }
+
+        table, th, td {
+            border: 1px solid white;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+
+        /* Form styling */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+	label {
+	    color: #66FF00;
+	}
+        input, select, button, a {
+            color: black;
+        }
+
+        input, select, button {
+            padding: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #007acc;
+            color: white;
+        }
+        
+        a {
+            color: white;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Search 911 Events</h1>
+        <!-- <a href="{{ url_for('logout') }}">Logout</a>  Logout link -->
+        <a href="{{ url_for('daily_summary') }}">Today's Call Summary</a>
+
+        <form method="post">
+		<label for="search_term">Search Term:</label>
+            <input type="text" name="search_term" id="search_term" placeholder="Enter search term" value="{{ search_term }}">
+
+            <label for="search_field">Field:</label>
+            <select name="search_field" id="search_field">
+                <option value="type" {% if search_field == 'type' %}selected{% endif %}>Type</option>
+                <option value="responder" {% if search_field == 'responder' %}selected{% endif %}>Responder</option>
+                <option value="area" {% if search_field == 'area' %}selected{% endif %}>Area</option>
+                <option value="address" {% if search_field == 'address' %}selected{% endif %}>Address</option>
+            </select>
+
+            <label for="date_filter">Date (optional):</label>
+            <input type="date" name="date_filter" id="date_filter" value="{{ date_filter }}">
+
+            <button type="submit">Search</button>
+        </form>
+
+        <h2>Results</h2>
+        {% if search_results %}
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Time</th>
+                    <th>Type</th>
+                    <th>Responder</th>
+                    <th>Area</th>
+                    <th>Address</th>
+                </tr>
+                {% for row in search_results %}
+                <tr>
+                    <td>{{ row["_id"] }}</td>
+                    <td>{{ row["time"] }}</td>
+                    <td>{{ row["type"] }}</td>
+                    <td>{{ row["responder"] }}</td>
+                    <td>{{ row["area"] }}</td>
+		    <!--<td>{{ row["address"] }}</td>-->
+		    <td>
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ row['address'] | urlencode }} Chattanooga, TN" target="_blank">
+                        {{ row["address"] }}
+                    </a>
+                </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No results found.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
