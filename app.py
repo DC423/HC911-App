@@ -40,9 +40,7 @@ def count_today_calls_by_type():
 
 @app.route('/daily_summary')
 def daily_summary():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    
+   
     # Get the counts of today's calls by type
     call_counts = count_today_calls_by_type()
     return render_template('daily_summary.html', call_counts=call_counts)
