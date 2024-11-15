@@ -51,6 +51,7 @@ Visit http://127.0.0.1:5000 in your browser to access the app.
 # Project Structure
 
 app.py: Main application file, manages routing and logic.
+
 templates/: Folder for HTML templates to render the app’s frontend.
 
 # Contributing
