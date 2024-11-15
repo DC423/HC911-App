@@ -19,23 +19,23 @@ HC911-App is a web application designed to search your local hc911 database that
 
 ## Installation
 
-	1.	Clone this repository:
+### Clone this repository:
 
-git clone https://github.com/DC423/HC911-App.git
-cd HC911-App
+```git clone https://github.com/DC423/HC911-App.git
+cd HC911-App```
 
 
-	2.	Install dependencies:
+### Install dependencies:
 
 ```pip install flask```
 
 
-	3.	Run the application:
+### Run the application:
 
-python -m app
+```python -m app```
 
 
-	4.	Visit http://127.0.0.1:5000 in your browser to access the app.
+Visit http://127.0.0.1:5000 in your browser to access the app.
 
 # Project Structure
 
