@@ -30,7 +30,7 @@ cd HC911-App
 ### Install dependencies:
 
 ```
-pip install flask
+pip install flask python-dotenv
 ```
 
 ### Edit Files and get hc911.db
