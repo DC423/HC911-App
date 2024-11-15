@@ -1,23 +1,23 @@
-Here’s a README template for your project:
 
-HC911-App
+
+# HC911-App
 
 HC911-App is a web application designed to search your local hc911 database that you created using https://github.com/DC423/HC911-Data. Built using Python and HTML, it leverages Flask (or similar framework if applicable) to create a responsive, user-friendly interface for [insert primary use case].
 
-Features
+## Features
 
 	•	User Interface: HTML templates for responsive design
 	•	Python-Driven Logic: Core backend functionality in app.py
 	•	Template-Based Rendering: Organized in the /templates folder
 
-Getting Started
+## Getting Started
 
-Prerequisites
+## Prerequisites
 
 	•	Python 3.x
 	•	Flask (if used; install via pip install flask)
 
-Installation
+## Installation
 
 	1.	Clone this repository:
 
@@ -37,12 +37,12 @@ python -m app
 
 	4.	Visit http://127.0.0.1:5000 in your browser to access the app.
 
-Project Structure
+# Project Structure
 
 	•	app.py: Main application file, manages routing and logic.
 	•	templates/: Folder for HTML templates to render the app’s frontend.
 
-Contributing
+# Contributing
 
 	1.	Fork the repository.
 	2.	Create a new branch: git checkout -b feature-branch
@@ -50,7 +50,7 @@ Contributing
 	4.	Push to the branch: git push origin feature-branch
 	5.	Submit a pull request.
 
-License
+# License
 
 This project is licensed under the MIT License. See LICENSE for more details.
 
