@@ -102,5 +102,6 @@ def index():
     return render_template('index.html', search_results=search_results, search_term=search_term, search_field=search_field, date_filter=date_filter)
 
 if __name__ == '__main__':
+    #change this if you want it to be remotely accessable by changing which line is commented out.
     #app.run(host='0.0.0.0', port=42069, debug=True)
     app.run(debug=True)
