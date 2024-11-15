@@ -27,7 +27,7 @@ cd HC911-App
 
 	2.	Install dependencies:
 
-pip install flask
+```pip install flask```
 
 
 	3.	Run the application:
