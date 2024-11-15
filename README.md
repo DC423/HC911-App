@@ -33,6 +33,11 @@ cd HC911-App
 pip install flask
 ```
 
+### Edit Files and get hc911.db
+
+```
+Ensure you have hc911.db locally, also change anything you want to change such as background image
+```
 
 ### Run the application:
 
