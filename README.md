@@ -6,9 +6,9 @@ HC911-App is a web application designed to search your local hc911 database that
 
 ## Features
 
-User Interface: HTML templates for responsive design
-Python-Driven Logic: Core backend functionality in app.py
-Template-Based Rendering: Organized in the /templates folder
+- User Interface: HTML templates for responsive design
+- Python-Driven Logic: Core backend functionality in app.py
+- Template-Based Rendering: Organized in the /templates folder
 
 ## Getting Started
 
