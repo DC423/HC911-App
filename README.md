@@ -65,4 +65,4 @@ templates/: Folder for HTML templates to render the app’s frontend.
 
 This project is licensed under the MIT License. See LICENSE for more details.
 
-Make sure to fill in the specific purpose of the app and adjust any dependencies or steps based on the actual code!
+
