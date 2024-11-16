@@ -2,7 +2,7 @@
 
 # HC911-App
 
-HC911-App is a web application designed to search your local hc911 database that you created using https://github.com/DC423/HC911-Data. Built using Python and HTML, it leverages Flask (or similar framework if applicable) to create a responsive, user-friendly interface for [insert primary use case].
+HC911-App is a web application designed to search your local hc911 database that you created using https://github.com/DC423/HC911-Data. Built using Python and HTML, it leverages Flask to create a responsive, user-friendly interface for searching the database for events, as well as a summary of todays calls so you can see trends over time. Eventually it could be done to make a page that looks at a year at a time, but I do not have a need for that at this time.
 
 ## Features
 
