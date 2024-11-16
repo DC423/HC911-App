@@ -48,6 +48,9 @@ python -m app
 
 Visit http://127.0.0.1:5000 in your browser to access the app.
 
+It should look like this
+<img src="static/images/screenshot.png">
+
 # Project Structure
 
 app.py: Main application file, manages routing and logic.
