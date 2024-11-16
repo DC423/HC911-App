@@ -53,9 +53,9 @@ It should look like this
 
 # Project Structure
 
-app.py: Main application file, manages routing and logic.
-
-templates/: Folder for HTML templates to render the app’s frontend.
+- app.py: Main application file, manages routing and logic.
+- templates/: Folder for HTML templates to render the app’s frontend.
+- static/images: folder for images used in the HTML
 
 # Contributing
 1) Fork the repository.
