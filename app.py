@@ -221,5 +221,5 @@ def login():
 
 if __name__ == '__main__':
     #change this if you want it to be remotely accessable by changing which line is commented out.
-    #app.run(host='0.0.0.0', port=42069, debug=True)
+    #app.run(host='0.0.0.0', port=5000, debug=True)
     app.run(debug=True)
