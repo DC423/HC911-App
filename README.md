@@ -46,7 +46,9 @@ python -m app
 ```
 
 
-Visit http://127.0.0.1:5000 in your browser to access the app.
+- Visit http://127.0.0.1:5000 in your browser to access the app.
+- You will need to register an account first, visit 127.0.0.1:5000/register
+- Once you have an account, log in at http://127.0.0.1:5000
 
 It should look like this
 <img src="static/images/screenshot.png">
