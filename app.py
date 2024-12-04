@@ -163,7 +163,7 @@ def logout():
     return redirect(url_for('login'))
 
 # Registration route
-@app.route('/callmemaybe', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
