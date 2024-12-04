@@ -1,3 +1,6 @@
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
+from werkzeug.security import check_password_hash, generate_password_hash
 from flask import Flask, render_template, request, redirect, url_for, session, g
 import sqlite3
 from datetime import datetime, timedelta
@@ -11,18 +14,30 @@ load_dotenv()
 
 # use the .env file to create a DATABASE_URL should be just hc911.db 
 DATABASE = os.getenv("DATABASE_URL")
+USERDB = 'users.db'
 
+# Initialize Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
 
-def get_db():
-    db = getattr(g, '_database', None)
+# User class for Flask-Login
+class User(UserMixin):
+    def __init__(self, id, username):
+        self.id = id
+        self.username = username
+
+def get_db(db_name):
+    db = getattr(g, f'_{db_name}', None)
     if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
+        db = sqlite3.connect(db_name)
         db.row_factory = sqlite3.Row  # Allows fetching results as dictionaries
+        setattr(g, f'_{db_name}', db)
     return db
 
 # New function to count today's calls by type with time window and address grouping
 def count_today_calls_by_type():
-    db = get_db()
+    db = get_db(DATABASE)
     cursor = db.cursor()
     today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = today_start + timedelta(days=1)
@@ -72,6 +87,7 @@ def count_today_calls_by_type():
     return [{'type': type_, 'count': count} for type_, count in sorted_summary]
 
 @app.route('/daily_summary')
+@login_required
 def daily_summary():
     # Get the counts of today's calls by type, grouped by address and time window
     call_counts = count_today_calls_by_type()
@@ -84,7 +100,7 @@ def close_connection(exception):
         db.close()
 
 def search_events(search_term, search_field, date_filter):
-    db = get_db()
+    db = get_db(DATABASE)
     cursor = db.cursor()
     
     # Base query to select all records
@@ -116,8 +132,17 @@ def search_events(search_term, search_field, date_filter):
     cursor.execute(query, parameters)
     return cursor.fetchall()
 
+# Fetch the user by ID for Flask-Login
+@login_manager.user_loader
+def load_user(user_id):
+    db = get_db(USERDB)
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+    user = cursor.fetchone()
+    return User(id=user['id'], username=user['username']) if user else None
 
 @app.route('/', methods=['GET', 'POST'])
+@login_required
 def index():
     
     search_results = []
@@ -130,6 +155,70 @@ def index():
         date_filter = request.form.get('date_filter', '')
         search_results = search_events(search_term, search_field, date_filter)
     return render_template('index.html', search_results=search_results, search_term=search_term, search_field=search_field, date_filter=date_filter)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()  # Logs the user out
+    flash("You have been logged out.", "info")
+    return redirect(url_for('login'))
+
+# Registration route
+@app.route('/callmemaybe', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+        
+        # Hash the password for security
+        password_hash = generate_password_hash(password)
+        
+        db = get_db(USERDB)
+        cursor = db.cursor()
+        
+        try:
+            # Insert the new user with hashed password and email
+            cursor.execute("INSERT INTO users (username, password, email) VALUES (?, ?, ?)", 
+                           (username, password_hash, email))
+            db.commit()
+            flash("Registration successful! Please log in.", "success")
+            return redirect(url_for('login'))
+        except sqlite3.IntegrityError:
+            flash("Username or email already exists. Please choose a different one.", "danger")
+        finally:
+            db.close()
+    
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # Process login form submission
+        username = request.form['username']
+        password = request.form['password']
+        
+        db = get_db(USERDB)
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+        user = cursor.fetchone()
+        print(user['password'])
+        
+        if user and check_password_hash(user['password'], password):
+            # Log in the user
+            login_user(User(id=user['id'], username=user['username']))
+            flash("Logged in successfully!", "success")
+            
+             # Redirect to the 'next' parameter if present, otherwise to 'daily_summary'
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('daily_summary'))
+        else:
+            # Invalid credentials
+            flash("Invalid credentials. Please try again.", "danger")
+            return redirect(url_for('login'))
+    
+    # If GET request, just render the login template
+    return render_template('login.html')
 
 if __name__ == '__main__':
     #change this if you want it to be remotely accessable by changing which line is commented out.
