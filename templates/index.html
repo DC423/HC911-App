@@ -7,7 +7,7 @@
     <style>
         /* Background styling */
         body {
-            background-image: url('{{ url_for('static', filename='images/background.png') }}');  
+            background-image: url('{{ url_for('static', filename='images/background.png') }}'); 
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -28,7 +28,7 @@
 
         h1, h2 {
             text-align: center;
-	    color: white;
+            color: white;
         }
 
         /* Table styling */
@@ -36,7 +36,7 @@
             width: 100%;
             margin-top: 10px;
             border-collapse: collapse;
-	    color: white;
+            color: white;
         }
 
         table, th, td {
@@ -55,9 +55,11 @@
             gap: 10px;
             margin-top: 10px;
         }
-	label {
-	    color: #66FF00;
-	}
+
+        label {
+            color: #66FF00;
+        }
+
         input, select, button, a {
             color: black;
         }
@@ -87,10 +89,13 @@
 <body>
     <div class="content">
         <h1>Search 911 Events</h1>
-        <a href="{{ url_for('daily_summary') }}">Today's Call Summary</a>
-
+        
+        <a href="{{ url_for('daily_summary') }}">Today's Call Summary</a> //
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% endif %}
         <form method="post">
-		<label for="search_term">Search Term:</label>
+            <label for="search_term">Search Term:</label>
             <input type="text" name="search_term" id="search_term" placeholder="Enter search term" value="{{ search_term }}">
 
             <label for="search_field">Field:</label>
@@ -116,7 +121,7 @@
                     <th>Type</th>
                     <th>Responder</th>
                     <th>Area</th>
-                    <th>Address</th>
+                    <th>Map</th>
                 </tr>
                 {% for row in search_results %}
                 <tr>
@@ -125,12 +130,11 @@
                     <td>{{ row["type"] }}</td>
                     <td>{{ row["responder"] }}</td>
                     <td>{{ row["area"] }}</td>
-		    <!--<td>{{ row["address"] }}</td>-->
-		    <td>
-                    <a href="https://www.google.com/maps/search/?api=1&query={{ row['address'] | urlencode }} Chattanooga, TN" target="_blank">
-                        {{ row["address"] }}
-                    </a>
-                </td>
+                    <td>
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ row['latitude'] }},{{ row['longitude'] }}" target="_blank">
+                            {{ row["address"] }}
+                        </a>
+                    </td>
                 </tr>
                 {% endfor %}
             </table>
