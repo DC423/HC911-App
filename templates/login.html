@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        /* Background styling */
+        body {
+            background-image: url('{{ url_for('static', filename='images/background.png') }}'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Container for readable content */
+        .content {
+            background-color: rgba(0, 0, 0, 0.7); /* Dark overlay for readability */
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        h1, h2 {
+            text-align: center;
+	    color: white;
+        }
+
+        /* Table styling */
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+	    color: white;
+        }
+
+        table, th, td {
+            border: 1px solid white;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+
+        /* Form styling */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+	label {
+	    color: #66FF00;
+	}
+        input, select, button, a {
+            color: black;
+        }
+
+        input, select, button {
+            padding: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #007acc;
+            color: white;
+        }
+        
+        a {
+            color: white;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h2>Login</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul>
+              {% for category, message in messages %}
+                <li class="alert alert-{{ category }}">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        <form action="{{ url_for('login') }}" method="POST">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" required><br><br>
+        
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password" required><br><br>
+        
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
+</html>
