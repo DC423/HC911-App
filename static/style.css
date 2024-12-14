@@ -1,0 +1,138 @@
+/* General styling */
+body {
+    background-image: url('/static/images/background.jpg'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+p, div, span, li {
+    color: white;
+}
+
+/* Content Container */
+.content {
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 800px;
+    margin: 20px auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+/* Headings */
+h1, h2 {
+    text-align: center;
+    color: white;
+    margin-bottom: 10px;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+    color: white;
+}
+
+table, th, td {
+    border: 1px solid white;
+}
+
+th, td {
+    padding: 8px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+/* Form Styling */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+label {
+    color: #66FF00;
+}
+
+input, select, button {
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    font-size: 1rem;
+}
+
+button {
+    cursor: pointer;
+    background-color: #007acc;
+    color: white;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 430px) {
+    /* Hide specific columns in the index table */
+    .index-table th:nth-child(1), .index-table td:nth-child(1), /* ID column */
+    .index-table th:nth-child(4), .index-table td:nth-child(4), /* Responder column */
+    .index-table th:nth-child(5), .index-table td:nth-child(5) /* Area column */ {
+        display: none;
+    }
+
+    .index-table {
+        font-size: 12px;
+    }
+
+    body {
+        background-image: none;
+        background-color: black;
+        color: white;
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .content {
+        padding: 10px;
+        margin: 10px;
+    }
+
+    table, th, td {
+        font-size: 12px;
+    }
+
+    h1, h2 {
+        font-size: 1.5rem;
+    }
+
+    input, select, button {
+        font-size: 0.9rem;
+    }
+}
+
+@media screen and (max-width: 390px) {
+    body {
+        font-size: 13px;
+    }
+
+    .content {
+        padding: 8px;
+    }
+
+    h1, h2 {
+        font-size: 1.4rem;
+    }
+}
