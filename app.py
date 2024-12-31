@@ -85,6 +85,28 @@ def count_today_calls_by_type():
     sorted_summary = sorted(summary.items(), key=lambda x: x[1], reverse=True)
     return [{'type': type_, 'count': count} for type_, count in sorted_summary]
 
+def count_today_calls_with_locations():
+    db = get_db(DATABASE)
+    cursor = db.cursor()
+    today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_end = today_start + timedelta(days=1)
+    
+    query = """
+    SELECT type, address, latitude, longitude, time
+    FROM events
+    WHERE time >= ? AND time < ?
+    """
+    cursor.execute(query, (today_start.strftime("%Y-%m-%d %H:%M:%S"), today_end.strftime("%Y-%m-%d %H:%M:%S")))
+    events = cursor.fetchall()
+    return [{'type': e['type'], 'address': e['address'], 'latitude': e['latitude'], 'longitude': e['longitude']} for e in events]
+
+@app.route('/daily_summary')
+@login_required
+def daily_summary():
+    call_counts = count_today_calls_by_type()
+    events = count_today_calls_with_locations()  # Fetch events with location data
+    return render_template('daily_summary.html', call_counts=call_counts, events=events)
+
 @app.route('/daily_summary')
 @login_required
 def daily_summary():
