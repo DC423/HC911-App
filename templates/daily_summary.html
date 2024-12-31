@@ -5,12 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Today's Call Summary</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
     <div class="content">
+	<!-- Add a Map Below -->
+            <h2>Today's Event Locations</h2>
+            <div id="map"></div>
         <h1>Today's Call Summary</h1>
         <a href="{{ url_for('index') }}">Back to Search</a>
-	<span style="color: white;">//</span>
+        <span style="color: white;">//</span>
         {% if current_user.is_authenticated %}
             <a href="{{ url_for('logout') }}">Logout</a>
         {% endif %}
@@ -35,5 +46,29 @@
             <p>No calls found for today.</p>
         {% endif %}
     </div>
+
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([37.7749, -122.4194], 13); // Default to a center point, update later
+
+        // Add a tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        // Add markers from server-provided data
+        const events = {{ events|tojson }};
+        events.forEach(event => {
+            const marker = L.marker([event.latitude, event.longitude])
+                .addTo(map)
+                .bindPopup(`<b>${event.type}</b><br>${event.address}`);
+        });
+
+        // Auto-fit the map to markers
+        if (events.length > 0) {
+            const bounds = events.map(event => [event.latitude, event.longitude]);
+            map.fitBounds(bounds);
+        }
+    </script>
 </body>
 </html>
