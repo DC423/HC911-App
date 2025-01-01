@@ -98,8 +98,14 @@ def count_today_calls_with_locations():
     """
     cursor.execute(query, (today_start.strftime("%Y-%m-%d %H:%M:%S"), today_end.strftime("%Y-%m-%d %H:%M:%S")))
     events = cursor.fetchall()
-    return [{'type': e['type'], 'address': e['address'], 'latitude': e['latitude'], 'longitude': e['longitude']} for e in events]
-
+    
+    # Filter out events with invalid GPS coordinates
+    valid_events = [
+        {'type': e['type'], 'address': e['address'], 'latitude': e['latitude'], 'longitude': e['longitude']}
+        for e in events
+        if (e['latitude'] != 0 or e['longitude'] != 0)  # Exclude invalid coordinates
+    ]
+    return valid_events
 
 @app.route('/daily_summary')
 @login_required
