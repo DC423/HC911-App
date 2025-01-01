@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, g
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
@@ -100,6 +100,7 @@ def count_today_calls_with_locations():
     events = cursor.fetchall()
     return [{'type': e['type'], 'address': e['address'], 'latitude': e['latitude'], 'longitude': e['longitude']} for e in events]
 
+
 @app.route('/daily_summary')
 @login_required
 def daily_summary():
@@ -107,13 +108,6 @@ def daily_summary():
     events = count_today_calls_with_locations()  # Fetch events with location data
     return render_template('daily_summary.html', call_counts=call_counts, events=events)
 
-@app.route('/daily_summary')
-@login_required
-def daily_summary():
-    # Get the counts of today's calls by type, grouped by address and time window
-    call_counts = count_today_calls_by_type()
-    return render_template('daily_summary.html', call_counts=call_counts)
-    
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_database', None)
@@ -185,7 +179,7 @@ def logout():
     return redirect(url_for('login'))
 
 # Registration route
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/callmemaybe', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
