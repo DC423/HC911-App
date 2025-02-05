@@ -212,6 +212,20 @@ def register():
     
     return render_template('register.html')
 
+@app.route('/active_incidents')
+@login_required
+def active_incidents():
+    api_url = "https://hc911-proxy.onrender.com/api/proxy" # LOL thanks 
+    try:
+        response = requests.get(api_url)
+        response.raise_for_status()  # Raise an error for bad responses
+        incidents = response.json()
+    except requests.RequestException as e:
+        flash(f"Error fetching active incidents: {e}", "danger")
+        incidents = []  # Fallback to an empty list on error
+
+    return render_template('active_incidents.html', incidents=incidents)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
