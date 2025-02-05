@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Incidents</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <a href="{{ url_for('index') }}">Home</a>
+        <span style="color: white;">//</span>
+        <a href="{{ url_for('daily_summary') }}">Today's Call Summary</a>
+        <span style="color: white;">//</span>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% endif %}
+
+        <h2>Active Incidents Map</h2>
+        <div id="map"></div>  <!-- Interactive Map -->
+
+        <h1>Active Incidents</h1>
+        {% if incidents %}
+            <table class="index-table">
+                <thead>
+                    <tr>
+                        <th>Incident ID</th>
+                        <th>Status</th>
+                        <th>Type</th>
+                        <th>Location</th>
+                        <th>Jurisdiction</th>
+                        <th>Priority</th>
+                        <th>Created Time</th>
+                        <th>Map</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for incident in incidents %}
+                        <tr>
+                            <td>{{ incident.sequencenumber }}</td>
+                            <td>{{ incident.status }}</td>
+                            <td>{{ incident.type_description }}</td>
+                            <td>{{ incident.location }}</td>
+                            <td>{{ incident.jurisdiction }}</td>
+                            <td>{{ incident.priority }}</td>
+                            <td>{{ incident.creation[:19].replace('T', ' ') }}</td>
+                            <td>
+                                <a href="https://www.google.com/maps/search/?api=1&query={{ incident.latitude }},{{ incident.longitude }}" target="_blank">
+                                    View Map
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No active incidents found.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([35.0456, -85.3097], 12); // Centered on Chattanooga, TN
+
+        // Add the OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        // Correct Icon URLs
+        const policeIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/128/5600/5600529.png',  // Police Icon
+            iconSize: [30, 30],
+            iconAnchor: [15, 30],
+            popupAnchor: [0, -30]
+        });
+
+        const fireIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/128/785/785116.png',    // Fire Icon
+            iconSize: [30, 30],
+            iconAnchor: [15, 30],
+            popupAnchor: [0, -30]
+        });
+
+        const emsIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/128/2869/2869684.png',  // EMS Icon
+            iconSize: [30, 30],
+            iconAnchor: [15, 30],
+            popupAnchor: [0, -30]
+        });
+
+        const defaultIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/252/252025.png',   // Default Marker Icon
+            iconSize: [30, 30],
+            iconAnchor: [15, 30],
+            popupAnchor: [0, -30]
+        });
+
+        // Add markers for each incident
+        const incidents = {{ incidents | tojson }};
+        const markers = [];
+
+        incidents.forEach(incident => {
+            if (incident.latitude && incident.longitude) {
+                let icon;
+
+                // Assign icons based on agency type
+                if (incident.agency_type === "Law") {
+                    icon = policeIcon;
+                } else if (incident.agency_type === "Fire") {
+                    icon = fireIcon;
+                } else if (incident.agency_type === "EMS") {
+                    icon = emsIcon;
+                } else {
+                    icon = defaultIcon;
+                }
+
+                const marker = L.marker([incident.latitude, incident.longitude], { icon: icon })
+                    .addTo(map)
+                    .bindPopup(`<b>${incident.type_description}</b><br>${incident.location}<br><i>${incident.status}</i>`);
+
+                markers.push(marker);
+            }
+        });
+
+        // Auto-fit the map to all markers
+        if (markers.length > 0) {
+            const group = new L.featureGroup(markers);
+            map.fitBounds(group.getBounds());
+        }
+    </script>
+</body>
+</html>
