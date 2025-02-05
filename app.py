@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, g
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
+import requests
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
