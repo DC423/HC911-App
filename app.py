@@ -217,8 +217,14 @@ def register():
 @login_required
 def active_incidents():
     api_url = "https://hc911-proxy.onrender.com/api/proxy" # LOL thanks willsims
+        headers = {
+        "Content-Type": "application/json",
+        "X-Frontend-Auth": "my-secure-token",  # Required for security
+        "Origin": "https://www.hamiltontn911.gov",  # Helps with CORS and verification
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36 Edg/117.0.2045.60"
+    }
     try:
-        response = requests.get(api_url)
+        response = requests.get(api_url, headers=headers)
         response.raise_for_status()  # Raise an error for bad responses
         incidents = response.json()
     except requests.RequestException as e:
