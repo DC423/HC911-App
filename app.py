@@ -216,7 +216,7 @@ def register():
 @app.route('/active_incidents')
 @login_required
 def active_incidents():
-    api_url = "https://hc911-proxy.onrender.com/api/proxy" # LOL thanks 
+    api_url = "https://hc911-proxy.onrender.com/api/proxy" # LOL thanks willsims
     try:
         response = requests.get(api_url)
         response.raise_for_status()  # Raise an error for bad responses
