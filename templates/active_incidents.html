@@ -29,7 +29,7 @@
                     <tbody>
                         {% for incident in incidents %}
                         <tr>
-                            <td><span class="badge">{{ incident.sequencenumber }}</span></td>
+                            <td><span class="incident-id">#{{ incident.sequencenumber }}</span></td>
                             <td>{{ incident.status }}</td>
                             <td>{{ incident.type_description }}</td>
                             <td>{{ incident.location }}</td>
@@ -80,3 +80,4 @@
     }
 </script>
 {% endblock %}
+

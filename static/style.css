@@ -76,3 +76,6 @@ tbody tr:hover { background: rgba(255, 255, 255, 0.04); }
     .card, .content, .topbar { padding: 16px; border-radius: 16px; }
     table { min-width: 620px; }
 }
+
+.incident-id { display: inline-flex; align-items: center; min-width: 5.5rem; justify-content: center; padding: 6px 12px; border-radius: 10px; background: rgba(77, 163, 255, 0.12); border: 1px solid rgba(77, 163, 255, 0.24); font-size: 0.86rem; font-weight: 600; }
+
