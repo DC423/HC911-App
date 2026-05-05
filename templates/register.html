@@ -1,105 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <style>
-        /* Background styling */
-        body {
-            background-image: url('{{ url_for('static', filename='images/background.png') }}'); 
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: white;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Container for readable content */
-        .content {
-            background-color: rgba(0, 0, 0, 0.7); /* Dark overlay for readability */
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 800px;
-            margin: 20px auto;
-        }
-
-        h1, h2 {
-            text-align: center;
-	    color: white;
-        }
-
-        /* Table styling */
-        table {
-            width: 100%;
-            margin-top: 10px;
-            border-collapse: collapse;
-	    color: white;
-        }
-
-        table, th, td {
-            border: 1px solid white;
-        }
-
-        th, td {
-            padding: 8px;
-            text-align: center;
-        }
-
-        /* Form styling */
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 10px;
-        }
-	label {
-	    color: #66FF00;
-	}
-        input, select, button, a {
-            color: black;
-        }
-
-        input, select, button {
-            padding: 5px;
-            border-radius: 5px;
-            border: none;
-        }
-
-        button {
-            cursor: pointer;
-            background-color: #007acc;
-            color: white;
-        }
-        
-        a {
-            color: white;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
-    <div class="content">
-        <h1>Register</h1>
+{% extends "base.html" %}
+{% block title %}Register · {{ app_name }}{% endblock %}
+{% block body %}
+<div class="auth-shell">
+    <section class="card auth-card">
+        <h2>Create an account</h2>
+        <p class="section-intro">Authentication is useful here because this app surfaces operational event history and live incident data from your imported database.</p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-list">
+                    {% for category, message in messages %}
+                        <li class="flash flash-{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
         <form method="post">
-            <label for="username">Username:</label>
-            <input type="text" name="username" id="username" required>
-
-            <label for="password">Password:</label>
-            <input type="password" name="password" id="password" required>
-
-            <label for="email">Email:</label>
-            <input type="email" name="email" id="email" required>
-
-            <button type="submit">Register</button>
+            <div>
+                <label for="username">Username</label>
+                <input type="text" name="username" id="username" autocomplete="username" required>
+            </div>
+            <div>
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" autocomplete="email" required>
+            </div>
+            <div>
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" autocomplete="new-password" required>
+            </div>
+            <div>
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" name="confirm_password" id="confirm_password" autocomplete="new-password" required>
+            </div>
+            <button type="submit">Create Account</button>
         </form>
-        <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a>.</p>
-    </div>
-</body>
-</html>
+        <p class="muted">Already have an account? <a href="{{ url_for('login') }}">Login here</a>.</p>
+    </section>
+</div>
+{% endblock %}

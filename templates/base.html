@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ app_name }}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head_extra %}{% endblock %}
+</head>
+<body>
+    {% block body %}
+    <div class="page-shell">
+        {% if current_user.is_authenticated %}
+        <header class="topbar">
+            <div class="brand">
+                <h1>{{ app_name }}</h1>
+                <p>Incident search, daily call intelligence, and active response awareness in one place.</p>
+            </div>
+            <div class="nav-links">
+                <a class="nav-pill" href="{{ url_for('daily_summary') }}">Daily Summary</a>
+                <a class="nav-pill" href="{{ url_for('index') }}">Search Events</a>
+                <a class="nav-pill" href="{{ url_for('active_incidents') }}">Active Incidents</a>
+                <a class="nav-pill" href="{{ url_for('logout') }}">Logout {{ current_user.username }}</a>
+            </div>
+        </header>
+
+        {% if dashboard_stats %}
+        <section class="stats-grid">
+            <div class="card">
+                <div class="muted">Total Events</div>
+                <div class="stat-value">{{ dashboard_stats.total_events }}</div>
+            </div>
+            <div class="card">
+                <div class="muted">Events Today</div>
+                <div class="stat-value">{{ dashboard_stats.today_events }}</div>
+            </div>
+            <div class="card">
+                <div class="muted">Latest Imported Record</div>
+                <div class="stat-value" style="font-size:1.1rem;">{{ dashboard_stats.latest_time or 'Unknown' }}</div>
+            </div>
+        </section>
+        {% endif %}
+        {% endif %}
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-list">
+                    {% for category, message in messages %}
+                        <li class="flash flash-{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+    {% endblock %}
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,35 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="content">
-        <h2>Login</h2>
-        <span style="color: white;">
+{% extends "base.html" %}
+{% block title %}Login · {{ app_name }}{% endblock %}
+{% block body %}
+<div class="auth-shell">
+    <section class="card auth-card">
+        <h2>Welcome back</h2>
+        <p class="section-intro">Sign in to review imported HC911 events, active incidents, and your daily summary dashboard.</p>
         {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <ul>
-              {% for category, message in messages %}
-                <li class="alert alert-{{ category }}">{{ message }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
+            {% if messages %}
+                <ul class="flash-list">
+                    {% for category, message in messages %}
+                        <li class="flash flash-{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         {% endwith %}
-        </span>
         <form action="{{ url_for('login') }}" method="POST">
-            <label for="username">Username:</label><br>
-            <input type="text" id="username" name="username" required><br><br>
-        
-            <label for="password">Password:</label><br>
-            <input type="password" id="password" name="password" required><br><br>
-        
+            <div>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" autocomplete="username" required>
+            </div>
+            <div>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" autocomplete="current-password" required>
+            </div>
             <button type="submit">Login</button>
         </form>
-    </div>
-</body>
-</html>
-
+        <p class="muted">Need a new account? <a href="{{ url_for('register') }}">Register here</a>.</p>
+    </section>
+</div>
+{% endblock %}
