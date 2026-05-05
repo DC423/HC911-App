@@ -45,6 +45,23 @@ class User(UserMixin):
         self.username = username
 
 
+def ensure_users_table():
+    db = get_db("USERDB")
+    cursor = db.cursor()
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            email TEXT UNIQUE,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.commit()
+
+
 def get_db(db_key: str):
     connection = getattr(g, db_key, None)
     if connection is None:
@@ -249,6 +266,7 @@ def inject_app_context():
 
 @login_manager.user_loader
 def load_user(user_id):
+    ensure_users_table()
     user = fetch_user_by_id(user_id)
     return User(user["id"], user["username"]) if user else None
 
@@ -313,6 +331,7 @@ def active_incidents():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    ensure_users_table()
     if current_user.is_authenticated:
         return redirect(url_for("daily_summary"))
 
@@ -346,6 +365,7 @@ def logout():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    ensure_users_table()
     if current_user.is_authenticated:
         return redirect(url_for("daily_summary"))
 
