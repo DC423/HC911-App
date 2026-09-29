@@ -1,83 +1,20 @@
 {% extends "base.html" %}
-{% block title %}Active Incidents  -  {{ app_name }}{% endblock %}
-{% block head_extra %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-{% endblock %}
+{% block title %}Active Incidents — {{ app_name }}{% endblock %}
+{% block head_extra %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">{% endblock %}
 {% block content %}
-<section class="content">
-    <h2>Active Incidents</h2>
-    <p class="section-intro">This page refreshes every 60 seconds so you can keep an eye on live incident activity without manually reloading.</p>
-    <div class="page-actions">
-        <a class="button-link" href="{{ url_for('active_incidents') }}">Refresh Now</a>
-    </div>
-</section>
-<section class="card-grid" style="margin-top: 18px;">
-    <div class="content">
-        <h3>Incident Map</h3>
-        <div id="map"></div>
-    </div>
-    <div class="content">
-        <h3>Incident Feed</h3>
-        {% if incidents %}
-            <div class="table-wrap">
-                <table class="index-table">
-                    <thead>
-                        <tr>
-                            <th>Incident ID</th><th>Status</th><th>Type</th><th>Location</th><th>Jurisdiction</th><th>Priority</th><th>Created</th><th>Map</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for incident in incidents %}
-                        <tr>
-                            <td><span class="incident-id">#{{ incident.sequencenumber }}</span></td>
-                            <td>{{ incident.status }}</td>
-                            <td>{{ incident.type_description }}</td>
-                            <td>{{ incident.location }}</td>
-                            <td>{{ incident.jurisdiction }}</td>
-                            <td>{{ incident.priority }}</td>
-                            <td>{{ incident.creation[:19].replace('T', ' ') if incident.creation else 'Unknown' }}</td>
-                            <td>
-                                {% if incident.latitude is not none and incident.longitude is not none %}
-                                <a href="https://www.google.com/maps/search/?api=1&query={{ incident.latitude }},{{ incident.longitude }}" target="_blank" rel="noreferrer">View</a>
-                                {% else %}
-                                <span class="muted">N/A</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <div class="empty-state">No active incidents were returned from the live feed.</div>
-        {% endif %}
-    </div>
+<header class="page-heading"><div><h1>Active Incidents</h1><p class="section-intro">Current incidents from the live feed. This page refreshes every 60 seconds.</p></div><a class="button secondary button-compact" href="{{ url_for('active_incidents') }}">Refresh</a></header>
+<section class="incident-layout">
+    <article class="panel map-panel"><div class="panel-header"><div class="panel-title-group"><h2>Incident Map</h2><div class="panel-kicker">Active incidents with available coordinates</div></div></div><div class="panel-body"><div id="map" aria-label="Map of active incidents"></div></div></article>
+    <article class="panel"><div class="panel-header"><div class="panel-title-group"><h2>Incident List</h2></div><span class="status-badge">{{ incidents|length }} active</span></div>
+    {% if incidents %}<div class="table-wrap table-scroll"><table><thead><tr><th>Incident</th><th>Status</th><th>Type</th><th>Location</th><th>Jurisdiction</th><th>Priority</th><th>Created</th></tr></thead><tbody>{% for incident in incidents %}<tr>
+        <td><span class="incident-id">#{{ incident.sequencenumber }}</span></td><td><span class="status-badge">{{ incident.status }}</span></td><td>{{ incident.type_description }}</td><td>{% if incident.latitude is not none and incident.longitude is not none %}<a class="external-link" href="https://www.google.com/maps/search/?api=1&query={{ incident.latitude }},{{ incident.longitude }}" target="_blank" rel="noreferrer">{{ incident.location }} ↗</a>{% else %}{{ incident.location }}{% endif %}</td><td>{{ incident.jurisdiction }}</td><td><span class="priority {{ 'priority-high' if incident.priority|string in ['1', '2'] }}">{{ incident.priority }}</span></td><td class="table-mono">{{ incident.creation[:19].replace('T', ' ') if incident.creation else 'Unknown' }}</td>
+    </tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state"><div><strong>No active incidents</strong>The live feed returned no current response activity.</div></div>{% endif %}</article>
 </section>
 {% endblock %}
 {% block scripts %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    setTimeout(() => window.location.reload(), 60000);
-    const map = L.map('map').setView([35.0456, -85.3097], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-    const icons = {
-        Law: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/128/5600/5600529.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-        Fire: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/128/785/785116.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-        EMS: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/128/2869/2869684.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] }),
-        default: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/252/252025.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] })
-    };
-    const incidents = {{ incidents|tojson }};
-    const markers = [];
-    incidents.forEach((incident) => {
-        if (incident.latitude === null || incident.longitude === null) return;
-        const icon = icons[incident.agency_type] || icons.default;
-        const marker = L.marker([incident.latitude, incident.longitude], { icon }).addTo(map).bindPopup(`<strong>${incident.type_description || 'Incident'}</strong><br>${incident.location || 'Unknown location'}<br><em>${incident.status || ''}</em>`);
-        markers.push(marker);
-    });
-    if (markers.length > 0) {
-        const group = new L.featureGroup(markers);
-        map.fitBounds(group.getBounds().pad(0.15));
-    }
+setTimeout(()=>window.location.reload(),60000);const map=L.map('map',{zoomControl:false}).setView([35.0456,-85.3097],11);L.control.zoom({position:'bottomright'}).addTo(map);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+const incidents={{ incidents|tojson }};const markers=[];const escapeHtml=(value)=>{const element=document.createElement('div');element.textContent=value||'';return element.innerHTML;};const markerIcon=(agency)=>{const kind=String(agency||'').toLowerCase();const markerClass=kind.includes('fire')?'fire':kind.includes('ems')||kind.includes('medical')?'ems':kind.includes('law')||kind.includes('police')?'law':'';const label=markerClass==='fire'?'F':markerClass==='ems'?'M':markerClass==='law'?'L':'911';return L.divIcon({className:`ops-marker ${markerClass}`,html:`<span>${label}</span>`,iconSize:[28,28]});};incidents.forEach((incident)=>{if(incident.latitude==null||incident.longitude==null)return;const marker=L.marker([incident.latitude,incident.longitude],{icon:markerIcon(incident.agency_type)}).addTo(map).bindPopup(`<strong>${escapeHtml(incident.type_description||'Incident')}</strong><br>${escapeHtml(incident.location||'Unknown location')}<br><em>${escapeHtml(incident.status||'')}</em>`);markers.push(marker);});if(markers.length)map.fitBounds(L.featureGroup(markers).getBounds().pad(.15));
 </script>
 {% endblock %}
-

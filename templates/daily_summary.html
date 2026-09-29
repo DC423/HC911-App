@@ -1,54 +1,27 @@
 {% extends "base.html" %}
-{% block title %}Daily Summary  -  {{ app_name }}{% endblock %}
-{% block head_extra %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-{% endblock %}
+{% block title %}Daily Overview — {{ app_name }}{% endblock %}
+{% block head_extra %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">{% endblock %}
 {% block content %}
-<section class="card-grid">
-    <div class="content">
-        <h2>Today's Event Locations</h2>
-        <p class="section-intro">Mapped event coordinates for today's imported calls.</p>
-        <div id="map"></div>
-    </div>
-    <div class="content">
-        <h2>Today's Call Summary</h2>
-        <p class="section-intro">Calls are grouped by type and deduplicated by address within a five-minute window.</p>
-        {% if call_counts %}
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr><th>Type</th><th>Count</th></tr>
-                    </thead>
-                    <tbody>
-                        {% for row in call_counts %}
-                        <tr>
-                            <td>{{ row["type"] }}</td>
-                            <td><span class="badge">{{ row["count"] }}</span></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <div class="empty-state">No calls were found for today.</div>
-        {% endif %}
-    </div>
+<header class="page-heading"><div><h1>Daily Summary</h1><p class="section-intro">Calls imported today from the HC911 database.</p></div></header>
+{% if dashboard_stats %}
+<section class="stats-grid" aria-label="Event statistics">
+    <article class="stat-card"><span class="stat-accent"></span><div class="stat-label">Events today</div><div class="stat-value">{{ dashboard_stats.today_events }}</div></article>
+    <article class="stat-card"><div class="stat-label">Total archived events</div><div class="stat-value">{{ dashboard_stats.total_events }}</div></article>
+    <article class="stat-card"><div class="stat-label">Latest imported record</div><div class="stat-value compact">{{ dashboard_stats.latest_time or 'No records available' }}</div></article>
+</section>
+{% endif %}
+<section class="dashboard-grid">
+    <article class="panel map-panel"><div class="panel-header"><div class="panel-title-group"><h2>Today’s Call Locations</h2><div class="panel-kicker">Calls with available coordinates</div></div></div><div class="panel-body"><div id="map" aria-label="Map of today's event locations"></div></div></article>
+    <article class="panel"><div class="panel-header"><div class="panel-title-group"><h2>Calls by Type</h2><div class="panel-kicker">Duplicate calls at the same address within five minutes are combined</div></div></div>
+        {% if call_counts %}<div class="table-wrap table-scroll"><table><thead><tr><th>Call type</th><th>Count</th></tr></thead><tbody>{% for row in call_counts %}<tr><td>{{ row["type"] }}</td><td><span class="count">{{ row["count"] }}</span></td></tr>{% endfor %}</tbody></table></div>
+        {% else %}<div class="empty-state"><div><strong>No activity yet</strong>No calls were found for today.</div></div>{% endif %}
+    </article>
 </section>
 {% endblock %}
 {% block scripts %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    const map = L.map('map').setView([35.0456, -85.3097], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-    const events = {{ events|tojson }};
-    const markers = [];
-    events.forEach((event) => {
-        const marker = L.marker([event.latitude, event.longitude]).addTo(map).bindPopup(`<strong>${event.type}</strong><br>${event.address}`);
-        markers.push(marker);
-    });
-    if (markers.length > 0) {
-        const group = new L.featureGroup(markers);
-        map.fitBounds(group.getBounds().pad(0.15));
-    }
+const map=L.map('map',{zoomControl:false}).setView([35.0456,-85.3097],11);L.control.zoom({position:'bottomright'}).addTo(map);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+const events={{ events|tojson }};const markers=[];const escapeHtml=(value)=>{const element=document.createElement('div');element.textContent=value||'';return element.innerHTML;};events.forEach((event)=>{if(event.latitude==null||event.longitude==null)return;const icon=L.divIcon({className:'ops-marker',html:'<span>911</span>',iconSize:[28,28]});const marker=L.marker([event.latitude,event.longitude],{icon}).addTo(map).bindPopup(`<strong>${escapeHtml(event.type)}</strong><br>${escapeHtml(event.address)}`);markers.push(marker);});if(markers.length)map.fitBounds(L.featureGroup(markers).getBounds().pad(.15));
 </script>
 {% endblock %}

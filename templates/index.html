@@ -1,65 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Search Events  -  {{ app_name }}{% endblock %}
+{% block title %}Event Search — {{ app_name }}{% endblock %}
 {% block content %}
-<section class="content">
-    <h2>Search Imported 911 Events</h2>
-    <p class="section-intro">Filter your event database by call type, responder, area, address, and optional date to quickly find historical activity.</p>
-    <form method="post">
-        <div class="form-grid">
-            <div>
-                <label for="search_term">Search Term</label>
-                <input type="text" name="search_term" id="search_term" placeholder="Ex: fire, medic, highway 58" value="{{ search_term }}">
-            </div>
-            <div>
-                <label for="search_field">Field</label>
-                <select name="search_field" id="search_field">
-                    {% for value, label_value in search_fields.items() %}
-                    <option value="{{ value }}" {% if search_field == value %}selected{% endif %}>{{ label_value|title }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label for="date_filter">Date</label>
-                <input type="date" name="date_filter" id="date_filter" value="{{ date_filter }}">
-            </div>
-        </div>
-        <div class="page-actions">
-            <button type="submit">Run Search</button>
-        </div>
-    </form>
-</section>
-<section class="content" style="margin-top: 18px;">
-    <h3>Search Results</h3>
-    {% if search_results %}
-        <p class="muted">Showing up to the 250 newest matching records.</p>
-        <div class="table-wrap">
-            <table class="index-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Time</th>
-                        <th>Type</th>
-                        <th>Responder</th>
-                        <th>Area</th>
-                        <th>Address</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in search_results %}
-                    <tr>
-                        <td><span class="badge">{{ row["_id"] }}</span></td>
-                        <td>{{ row["time"] }}</td>
-                        <td>{{ row["type"] }}</td>
-                        <td>{{ row["responder"] }}</td>
-                        <td>{{ row["area"] }}</td>
-                        <td><a href="https://www.google.com/maps/search/?api=1&query={{ row['latitude'] }},{{ row['longitude'] }}" target="_blank" rel="noreferrer">{{ row["address"] }}</a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <div class="empty-state">Run a search to explore imported events from your database.</div>
-    {% endif %}
-</section>
+<header class="page-heading"><div><h1>Search Events</h1><p class="section-intro">Search the imported call history by keyword or date.</p></div></header>
+{% if dashboard_stats %}<section class="stats-grid" aria-label="Database statistics"><article class="stat-card"><div class="stat-label">Indexed events</div><div class="stat-value">{{ dashboard_stats.total_events }}</div></article><article class="stat-card"><div class="stat-label">Added today</div><div class="stat-value">{{ dashboard_stats.today_events }}</div></article><article class="stat-card"><div class="stat-label">Latest record</div><div class="stat-value compact">{{ dashboard_stats.latest_time or 'No records available' }}</div></article></section>{% endif %}
+<section class="panel"><div class="panel-header"><div class="panel-title-group"><h2>Search Filters</h2><div class="panel-kicker">Up to 250 of the newest matching records will be shown</div></div></div><div class="panel-body">
+    <form method="post"><div class="form-grid"><div><label for="search_term">Search term</label><input type="text" name="search_term" id="search_term" placeholder="Fire, medic, Highway 58" value="{{ search_term }}"></div><div><label for="search_field">Search field</label><select name="search_field" id="search_field">{% for value, label_value in search_fields.items() %}<option value="{{ value }}" {% if search_field == value %}selected{% endif %}>{{ label_value|title }}</option>{% endfor %}</select></div><div><label for="date_filter">Event date</label><input type="date" name="date_filter" id="date_filter" value="{{ date_filter }}"></div></div><div class="form-actions"><p class="result-note">You can search by term, date, or both.</p><button type="submit">Search</button></div></form>
+</div></section>
+<section class="panel" style="margin-top:18px"><div class="panel-header"><div class="panel-title-group"><h2>Search Results</h2></div>{% if search_results %}<span class="status-badge">{{ search_results|length }} results</span>{% endif %}</div>
+{% if search_results %}<div class="table-wrap table-scroll"><table><thead><tr><th>ID</th><th>Time</th><th>Type</th><th>Responder</th><th>Area</th><th>Address</th></tr></thead><tbody>{% for row in search_results %}<tr><td class="incident-id">#{{ row["_id"] }}</td><td class="table-mono">{{ row["time"] }}</td><td>{{ row["type"] }}</td><td>{{ row["responder"] }}</td><td>{{ row["area"] }}</td><td><a class="external-link" href="https://www.google.com/maps/search/?api=1&query={{ row['latitude'] }},{{ row['longitude'] }}" target="_blank" rel="noreferrer">{{ row["address"] }} ↗</a></td></tr>{% endfor %}</tbody></table></div>
+{% else %}<div class="empty-state"><div><strong>No results to display</strong>Use the filters above to search the event database.</div></div>{% endif %}</section>
 {% endblock %}
