@@ -19,7 +19,11 @@ from werkzeug.security import check_password_hash, generate_password_hash
 load_dotenv()
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY") or "hc911-dev-secret-change-me"
+app.config["SECRET_KEY"] = (
+    os.getenv("SECRET_KEY")
+    or os.getenv("FLASK_SECRET_KEY")
+    or "hc911-dev-secret-change-me"
+)
 app.config["DATABASE"] = os.getenv("DATABASE_URL", "hc911.db")
 app.config["USERDB"] = os.getenv("USER_DATABASE_URL", "users.db")
 app.config["INCIDENTS_API_URL"] = os.getenv(
@@ -37,6 +41,12 @@ SEARCH_FIELDS = {
     "area": "area",
     "address": "address",
 }
+
+
+def events_has_coordinates():
+    db = get_db("DATABASE")
+    columns = {row["name"] for row in db.execute("PRAGMA table_info(events)")}
+    return {"latitude", "longitude"}.issubset(columns)
 
 
 class User(UserMixin):
@@ -137,6 +147,9 @@ def count_today_calls_by_type():
 
 
 def count_today_calls_with_locations():
+    if not events_has_coordinates():
+        return []
+
     db = get_db("DATABASE")
     cursor = db.cursor()
     today_start, today_end = get_today_bounds()
@@ -199,7 +212,12 @@ def search_events(search_term, search_field, date_filter, limit=250):
     cursor = db.cursor()
 
     safe_field = SEARCH_FIELDS.get(search_field, "type")
-    query = "SELECT * FROM events"
+    coordinates = (
+        "latitude, longitude"
+        if events_has_coordinates()
+        else "NULL AS latitude, NULL AS longitude"
+    )
+    query = f"SELECT events.*, {coordinates} FROM events"
     conditions = []
     parameters = []
 
